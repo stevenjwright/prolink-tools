@@ -2,7 +2,7 @@
   "name": "stv-prolink-tools",
   "version": "0.1.0-beta.6",
   "description": "A collection of userfriendly tools for DJs using Pioneers PRO DJ LINK feature",
-  "author": "Evan Purkhiser <evanpurkhiser@gmail.com>",
+  "author": "Steven J. Wright <hey@stevenjwright.me>",
   "license": "MIT",
   "scripts": {
     "start-dev:main": "webpack --watch --config=webpack.config.main.ts",
@@ -26,7 +26,7 @@
   "main": "main.js",
   "build": {
     "productName": "STV Prolink Tools",
-    "appId": "com.evanpurkhiser.tools.prolink",
+    "appId": "com.slipstreamtv.tools.prolink",
     "artifactName": "${name}-${version}-${os}.${ext}",
     "directories": {
       "output": "release"

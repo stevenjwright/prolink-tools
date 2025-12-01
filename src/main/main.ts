@@ -37,6 +37,13 @@ const mainStore = createAppStore();
 
 export const withMainStore = (cb: (store: AppStore) => void) => cb(mainStore);
 
+// Debug logging helper
+const debugLog = (...args: any[]) => {
+  if (mainStore.config.debugLogging) {
+    console.log(...args);
+  }
+};
+
 // Update the store with user details ASAP
 (async () => {
   const user = await userInfo;
@@ -87,10 +94,6 @@ const createWindow = () => {
 
   win.on('closed', () => (win = null));
 
-  // Always open dev tools for debugging
-  process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';
-  win.webContents.once('dom-ready', () => win!.webContents.openDevTools());
-
   const indexUrl = isDev
     ? 'http://127.0.0.1:2003/index.html'
     : url.format({
@@ -112,51 +115,54 @@ const createWindow = () => {
 };
 
 app.on('ready', async () => {
-  console.log('[Main] App ready event fired');
+  debugLog('[Main] App ready event fired');
 
   try {
     await loadMainConfig(mainStore);
-    console.log('[Main] Config loaded');
+    debugLog('[Main] Config loaded');
 
     observerAndPersistConfig(mainStore);
     mainStore.config.ensureDefaults();
     runConfigMigrations(mainStore);
-    console.log('[Main] Config initialized');
+    debugLog('[Main] Config initialized');
 
-    createWindow();
-    console.log('[Main] Window created');
+    const window = createWindow();
+    debugLog('[Main] Window created');
+
+    // Setup menu with window reference for dev tools toggle
+    setupMenu(mainStore, window);
 
     const [register] = observeStore({target: mainStore});
     registerMainIpc(mainStore, register);
-    console.log('[Main] IPC registered');
+    debugLog('[Main] IPC registered');
 
     let network: ProlinkNetwork | undefined;
 
     // Open connections to the network
-    console.log('[Main] Attempting to bring network online...');
+    debugLog('[Main] Attempting to bring network online...');
     try {
       network = await bringOnline();
-      console.log('[Main] Network brought online successfully');
+      debugLog('[Main] Network brought online successfully');
     mainStore.markNetworkState(network.state);
 
     // Attempt to autoconfigure from other devices on the network
     await network.autoconfigFromPeers();
     network.connect();
     mainStore.markNetworkState(network.state);
-    console.log('[Main] Network configured and connected');
+    debugLog('[Main] Network configured and connected');
   } catch (e: any) {
-    console.log('[Main] Network connection failed:', e);
+    debugLog('[Main] Network connection failed:', e);
     if (e.code !== 'EADDRINUSE') {
       console.error('[Main] Unexpected network error, rethrowing:', e);
       throw e;
     }
 
     // Something is using the status port... Most likely rekordbox
-    console.log('[Main] Port in use (EADDRINUSE), marking network as failed');
+    debugLog('[Main] Port in use (EADDRINUSE), marking network as failed');
     mainStore.markNetworkState(NetworkState.Failed);
   }
 
-  console.log('[Main] About to start overlay server...');
+  debugLog('[Main] About to start overlay server...');
   // Start overlay http / websocket server.
   //
   // XXX: Becuase of a strange bug in MacOS's firewall dialog, if two
@@ -170,15 +176,15 @@ app.on('ready', async () => {
   // As thus THIS LINE MUST BE PLACED AFTER THE NETWORK IS BROUGHT ONLINE.
   //
   const httpServer = await startOverlayServer();
-  console.log('[Main] Overlay server started successfully');
+  debugLog('[Main] Overlay server started successfully');
 
   // Start the main websocket on the overlay server (this doesn't depend on DJ network)
   registerMainWebsocket(mainStore, httpServer, register);
-  console.log('[Main] Overlay WebSocket registered');
+  debugLog('[Main] Overlay WebSocket registered');
 
   // Only set up network-dependent features if network is available
   if (network) {
-    console.log('[Main] Setting up network-dependent features...');
+    debugLog('[Main] Setting up network-dependent features...');
 
     // Connect to api.prolink.tools when enabled
     reaction(
@@ -195,12 +201,12 @@ app.on('ready', async () => {
     connectNetworkStore(mainStore, network);
     registerDebuggingEventsService(mainStore, network);
     setupSaveHistory(mainStore);
-    console.log('[Main] Network-dependent features set up');
+    debugLog('[Main] Network-dependent features set up');
   } else {
-    console.log('[Main] Skipping network-dependent features (network unavailable)');
+    debugLog('[Main] Skipping network-dependent features (network unavailable)');
   }
 
-  console.log('[Main] App startup complete');
+  debugLog('[Main] App startup complete');
   } catch (error) {
     console.error('[Main] FATAL ERROR during app startup:', error);
     throw error;

@@ -62,6 +62,12 @@ export class AppConfig {
   @observable
   sidebarCollapsed = false;
   /**
+   * Enable debug logging to console
+   */
+  @serializable
+  @observable
+  debugLogging = false;
+  /**
    * The last version that was run prior to this run
    */
   @serializable
@@ -76,6 +82,11 @@ export class AppConfig {
   @action
   toggleTheme() {
     this.theme = this.theme === 'light' ? 'dark' : 'light';
+  }
+
+  @action
+  toggleDebugLogging() {
+    this.debugLogging = !this.debugLogging;
   }
 
   @action

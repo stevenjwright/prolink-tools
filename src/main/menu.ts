@@ -1,11 +1,11 @@
-import {app, Menu, shell} from 'electron';
+import {app, BrowserWindow, Menu, shell} from 'electron';
 
 import {AppStore} from 'src/shared/store';
 import playingTracksRoutine from 'src/website/demo/playingTracks';
 
 import {isDev} from './main';
 
-export function setupMenu(store: AppStore) {
+export function setupMenu(store: AppStore, window?: BrowserWindow) {
   const isMac = process.platform === 'darwin';
 
   const template: Electron.MenuItemConstructorOptions[] = [
@@ -47,6 +47,18 @@ export function setupMenu(store: AppStore) {
         {role: 'reload'},
         {role: 'forceReload'},
         {role: 'togglefullscreen'},
+        {type: 'separator'},
+        {
+          accelerator: 'cmd + option + i',
+          label: 'Toggle Developer Tools',
+          click: () => window?.webContents.toggleDevTools(),
+        },
+        {
+          accelerator: 'cmd + shift + l',
+          label: 'Toggle Debug Logging',
+          click: () => store.config.toggleDebugLogging(),
+        },
+        {type: 'separator'},
         {
           accelerator: 'cmd + option + s',
           label: 'Toggle Sidebar',

@@ -1,6 +1,6 @@
 {
-  "name": "prolink-tools",
-  "version": "0.1.0-beta.5",
+  "name": "stv-prolink-tools",
+  "version": "0.1.0-beta.6",
   "description": "A collection of userfriendly tools for DJs using Pioneers PRO DJ LINK feature",
   "author": "Evan Purkhiser <evanpurkhiser@gmail.com>",
   "license": "MIT",
@@ -25,7 +25,7 @@
   },
   "main": "main.js",
   "build": {
-    "productName": "Prolink Tools",
+    "productName": "STV Prolink Tools",
     "appId": "com.evanpurkhiser.tools.prolink",
     "artifactName": "${name}-${version}-${os}.${ext}",
     "directories": {

@@ -43,6 +43,8 @@ tracker.
 
 [Development builds](https://github.com/evanpurkhiser/prolink-tools/releases/tag/main-build) are available.
 
+See [DEVELOPMENT.md](DEVELOPMENT.md) for technical details and how to run the project locally.
+
 #### Disclaimer
 
 This project is not affiliated, associated, authorized, endorsed by, or in any

@@ -122,8 +122,8 @@ function drawScrollingWaveform(
 
   const doDrawing = (ts: DOMHighResTimeStamp) => {
     ctx.clearRect(0, 0, width, height);
-    ctx.drawImage(trackLine, 0, 0, width, height);
-    ctx.drawImage(offscreen, posX * -1, 0);
+    ctx.drawImage(trackLine as any, 0, 0, width, height);
+    ctx.drawImage(offscreen as any, posX * -1, 0);
 
     if (lastTs === 0) {
       lastTs = ts;

@@ -128,7 +128,7 @@ app.on('ready', async () => {
   // Open connections to the network
   try {
     network = await bringOnline();
-  } catch (e) {
+  } catch (e: any) {
     if (e.errno !== 'EADDRINUSE') {
       throw e;
     }

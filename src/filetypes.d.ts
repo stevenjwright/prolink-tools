@@ -12,3 +12,18 @@ declare module '*.ttf' {
 
 declare module '*.png';
 declare module '*.webm';
+
+// OffscreenCanvas is available in Electron but not in base TypeScript lib
+declare class OffscreenCanvas implements CanvasImageSource {
+  constructor(width: number, height: number);
+  width: number;
+  height: number;
+  getContext(contextId: '2d'): OffscreenCanvasRenderingContext2D | null;
+  convertToBlob(options?: {type?: string; quality?: number}): Promise<Blob>;
+  transferToImageBitmap(): ImageBitmap;
+}
+
+interface OffscreenCanvasRenderingContext2D extends CanvasRenderingContext2D {}
+
+// Extend CanvasImageSource to include OffscreenCanvas
+interface CanvasImageSource {}

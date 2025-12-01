@@ -288,7 +288,7 @@ const TrackContainer = styled(motion.div)<{alignRight?: boolean}>`
   display: inline-grid;
   grid-gap: 0.5rem;
   color: ${cssVar('--pt-np-primary-text')};
-  font-family: Ubuntu;
+  font-family: 'Aeonik BP Live', sans-serif;
   justify-content: ${p => (p.alignRight ? 'right' : 'left')};
   grid-template-columns: ${p =>
     p.alignRight

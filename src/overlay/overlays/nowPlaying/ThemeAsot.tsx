@@ -200,7 +200,7 @@ const TrackContainer = styled(motion.div)<{alignRight?: boolean}>`
   flex-direction: column;
   grid-gap: 0.5rem;
   color: ${cssVar('--pt-np-primary-text')};
-  font-family: 'Proxmia Nova';
+  font-family: 'Aeonik BP Live', sans-serif;
   font-size: 2rem;
   text-rendering: optimizeLegibility;
 

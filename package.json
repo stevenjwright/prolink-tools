@@ -32,25 +32,37 @@
       "output": "release"
     },
     "publish": null,
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**/*",
+      "node_modules/bindings/**/*",
+      "node_modules/file-uri-to-path/**/*"
+    ],
     "files": [
-      "!**/*",
       {
         "from": "dist/",
         "to": "./",
         "filter": [
           "**/*",
-          "!**/*.map"
+          "!**/*.map",
+          "!overlay/**/*"
         ]
       },
+      "!node_modules/**/*",
       "node_modules/better-sqlite3/**/*",
       "node_modules/bindings/**/*",
       "node_modules/file-uri-to-path/**/*",
       "package.json"
     ],
+    "extraResources": [
+      {
+        "from": "dist/overlay",
+        "to": "overlay"
+      }
+    ],
     "extraFiles": [
       "LICENSE"
     ],
-    "npmRebuild": false,
+    "npmRebuild": true,
     "linux": {
       "target": "tar.gz"
     },
@@ -59,7 +71,8 @@
     },
     "mac": {
       "target": "dmg",
-      "category": "public.app-category.music"
+      "category": "public.app-category.music",
+      "identity": null
     }
   },
   "resolutions": {

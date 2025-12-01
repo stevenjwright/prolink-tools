@@ -87,10 +87,9 @@ const createWindow = () => {
 
   win.on('closed', () => (win = null));
 
-  if (isDev) {
-    process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';
-    win.webContents.once('dom-ready', () => win!.webContents.openDevTools());
-  }
+  // Always open dev tools for debugging
+  process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';
+  win.webContents.once('dom-ready', () => win!.webContents.openDevTools());
 
   const indexUrl = isDev
     ? 'http://127.0.0.1:2003/index.html'
@@ -113,38 +112,51 @@ const createWindow = () => {
 };
 
 app.on('ready', async () => {
-  await loadMainConfig(mainStore);
-  observerAndPersistConfig(mainStore);
-  mainStore.config.ensureDefaults();
-  runConfigMigrations(mainStore);
+  console.log('[Main] App ready event fired');
 
-  createWindow();
-
-  const [register] = observeStore({target: mainStore});
-  registerMainIpc(mainStore, register);
-
-  let network: ProlinkNetwork;
-
-  // Open connections to the network
   try {
-    network = await bringOnline();
+    await loadMainConfig(mainStore);
+    console.log('[Main] Config loaded');
+
+    observerAndPersistConfig(mainStore);
+    mainStore.config.ensureDefaults();
+    runConfigMigrations(mainStore);
+    console.log('[Main] Config initialized');
+
+    createWindow();
+    console.log('[Main] Window created');
+
+    const [register] = observeStore({target: mainStore});
+    registerMainIpc(mainStore, register);
+    console.log('[Main] IPC registered');
+
+    let network: ProlinkNetwork | undefined;
+
+    // Open connections to the network
+    console.log('[Main] Attempting to bring network online...');
+    try {
+      network = await bringOnline();
+      console.log('[Main] Network brought online successfully');
+    mainStore.markNetworkState(network.state);
+
+    // Attempt to autoconfigure from other devices on the network
+    await network.autoconfigFromPeers();
+    network.connect();
+    mainStore.markNetworkState(network.state);
+    console.log('[Main] Network configured and connected');
   } catch (e: any) {
-    if (e.errno !== 'EADDRINUSE') {
+    console.log('[Main] Network connection failed:', e);
+    if (e.code !== 'EADDRINUSE') {
+      console.error('[Main] Unexpected network error, rethrowing:', e);
       throw e;
     }
 
     // Something is using the status port... Most likely rekordbox
+    console.log('[Main] Port in use (EADDRINUSE), marking network as failed');
     mainStore.markNetworkState(NetworkState.Failed);
-    return;
   }
 
-  mainStore.markNetworkState(network.state);
-
-  // Attempt to autoconfigure from other devices on the network
-  await network.autoconfigFromPeers();
-  network.connect();
-  mainStore.markNetworkState(network.state);
-
+  console.log('[Main] About to start overlay server...');
   // Start overlay http / websocket server.
   //
   // XXX: Becuase of a strange bug in MacOS's firewall dialog, if two
@@ -158,25 +170,41 @@ app.on('ready', async () => {
   // As thus THIS LINE MUST BE PLACED AFTER THE NETWORK IS BROUGHT ONLINE.
   //
   const httpServer = await startOverlayServer();
+  console.log('[Main] Overlay server started successfully');
 
-  // Start the main websocket on the overlay server
+  // Start the main websocket on the overlay server (this doesn't depend on DJ network)
   registerMainWebsocket(mainStore, httpServer, register);
+  console.log('[Main] Overlay WebSocket registered');
 
-  // Connect to api.prolink.tools when enabled
-  reaction(
-    () => mainStore.config.cloudTools.enabled,
-    enabled => {
-      if (enabled) {
-        const disconnect = startMainApiWebsocket(mainStore, register);
-        when(() => mainStore.config.cloudTools.enabled === false, disconnect);
-      }
-    },
-    {fireImmediately: true}
-  );
+  // Only set up network-dependent features if network is available
+  if (network) {
+    console.log('[Main] Setting up network-dependent features...');
 
-  connectNetworkStore(mainStore, network);
-  registerDebuggingEventsService(mainStore, network);
-  setupSaveHistory(mainStore);
+    // Connect to api.prolink.tools when enabled
+    reaction(
+      () => mainStore.config.cloudTools.enabled,
+      enabled => {
+        if (enabled) {
+          const disconnect = startMainApiWebsocket(mainStore, register);
+          when(() => mainStore.config.cloudTools.enabled === false, disconnect);
+        }
+      },
+      {fireImmediately: true}
+    );
+
+    connectNetworkStore(mainStore, network);
+    registerDebuggingEventsService(mainStore, network);
+    setupSaveHistory(mainStore);
+    console.log('[Main] Network-dependent features set up');
+  } else {
+    console.log('[Main] Skipping network-dependent features (network unavailable)');
+  }
+
+  console.log('[Main] App startup complete');
+  } catch (error) {
+    console.error('[Main] FATAL ERROR during app startup:', error);
+    throw error;
+  }
 });
 
 app.on('window-all-closed', () => {

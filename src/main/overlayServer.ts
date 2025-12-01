@@ -10,9 +10,30 @@ import {WEBSERVER_PORT} from 'src/shared/constants';
 
 import {isDev} from './main';
 
-const OVERLAY_ROOT = path.resolve(__dirname, 'overlay');
+// In development, overlay files are in dist/overlay
+// In production, overlay files are in Resources/overlay (extraResources)
+const OVERLAY_ROOT = isDev
+  ? path.resolve(__dirname, 'overlay')
+  : path.join(process.resourcesPath, 'overlay');
 
 export async function startOverlayServer() {
+  console.log('[Overlay Server] Starting overlay server...');
+  console.log('[Overlay Server] isDev:', isDev);
+  console.log('[Overlay Server] __dirname:', __dirname);
+  console.log('[Overlay Server] process.resourcesPath:', process.resourcesPath);
+  console.log('[Overlay Server] OVERLAY_ROOT:', OVERLAY_ROOT);
+  console.log('[Overlay Server] WEBSERVER_PORT:', WEBSERVER_PORT);
+
+  // Check if overlay directory exists
+  try {
+    const stats = fs.statSync(OVERLAY_ROOT);
+    console.log('[Overlay Server] Overlay directory exists:', stats.isDirectory());
+    const files = fs.readdirSync(OVERLAY_ROOT);
+    console.log('[Overlay Server] Files in overlay directory:', files);
+  } catch (err) {
+    console.error('[Overlay Server] Error accessing overlay directory:', err);
+  }
+
   const app = connect();
   const httpServer = http.createServer(app);
 
@@ -38,9 +59,17 @@ export async function startOverlayServer() {
   app.use(handler);
 
   // Start listening for connections
-  await new Promise<void>(resolve =>
-    httpServer.listen(WEBSERVER_PORT, '0.0.0.0', resolve)
-  );
+  await new Promise<void>((resolve, reject) => {
+    httpServer.on('error', (err: any) => {
+      console.error('[Overlay Server] Error starting server:', err);
+      reject(err);
+    });
+
+    httpServer.listen(WEBSERVER_PORT, '0.0.0.0', () => {
+      console.log(`[Overlay Server] Server listening on http://0.0.0.0:${WEBSERVER_PORT}`);
+      resolve();
+    });
+  });
 
   return httpServer;
 }

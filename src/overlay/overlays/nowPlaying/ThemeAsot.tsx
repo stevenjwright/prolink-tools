@@ -183,10 +183,11 @@ type TrackProps = MotionDivProps & {
    * The string used to mask ID tracks. Blank if ID masks are disabled
    */
   idMask?: string;
+  fontFamily?: string;
 };
 
-const Track = ({played, idMask, ...props}: TrackProps) => (
-  <TrackContainer {...props}>
+const Track = ({played, idMask, fontFamily, ...props}: TrackProps) => (
+  <TrackContainer fontFamily={fontFamily} {...props}>
     <FullMetadata
       alignRight={props.alignRight}
       track={played.metadataIncludes(idMask) ? idTrack : played.track}
@@ -195,12 +196,15 @@ const Track = ({played, idMask, ...props}: TrackProps) => (
   </TrackContainer>
 );
 
-const TrackContainer = styled(motion.div)<{alignRight?: boolean}>`
+const TrackContainer = styled(motion.div)<{alignRight?: boolean; fontFamily?: string}>`
   display: flex;
   flex-direction: column;
   grid-gap: 0.5rem;
   color: ${cssVar('--pt-np-primary-text')};
-  font-family: 'Aeonik BP Live', sans-serif;
+  font-family: ${p =>
+    p.fontFamily === 'beatport'
+      ? "'Aeonik BP Live', sans-serif"
+      : "'Proxima Nova', sans-serif"};
   font-size: 2rem;
   text-rendering: optimizeLegibility;
 
@@ -253,6 +257,7 @@ const ThemeAsot: React.FC<Props> = observer(({appConfig, config, history}) =>
       alignRight={config.alignRight}
       tags={config.tags}
       idMask={config.maskId ? appConfig.idMarker : ''}
+      fontFamily={config.fontFamily}
       played={history[0]}
     />
   )

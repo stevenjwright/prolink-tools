@@ -8,7 +8,16 @@ import * as path from 'path';
 
 import {WEBSERVER_PORT} from 'src/shared/constants';
 
-import {isDev} from './main';
+import {isDev, withMainStore} from './main';
+
+// Debug logging helper
+const debugLog = (...args: any[]) => {
+  withMainStore(store => {
+    if (store.config.debugLogging) {
+      console.log(...args);
+    }
+  });
+};
 
 // In development, overlay files are in dist/overlay
 // In production, overlay files are in Resources/overlay (extraResources)
@@ -17,19 +26,19 @@ const OVERLAY_ROOT = isDev
   : path.join(process.resourcesPath, 'overlay');
 
 export async function startOverlayServer() {
-  console.log('[Overlay Server] Starting overlay server...');
-  console.log('[Overlay Server] isDev:', isDev);
-  console.log('[Overlay Server] __dirname:', __dirname);
-  console.log('[Overlay Server] process.resourcesPath:', process.resourcesPath);
-  console.log('[Overlay Server] OVERLAY_ROOT:', OVERLAY_ROOT);
-  console.log('[Overlay Server] WEBSERVER_PORT:', WEBSERVER_PORT);
+  debugLog('[Overlay Server] Starting overlay server...');
+  debugLog('[Overlay Server] isDev:', isDev);
+  debugLog('[Overlay Server] __dirname:', __dirname);
+  debugLog('[Overlay Server] process.resourcesPath:', process.resourcesPath);
+  debugLog('[Overlay Server] OVERLAY_ROOT:', OVERLAY_ROOT);
+  debugLog('[Overlay Server] WEBSERVER_PORT:', WEBSERVER_PORT);
 
   // Check if overlay directory exists
   try {
     const stats = fs.statSync(OVERLAY_ROOT);
-    console.log('[Overlay Server] Overlay directory exists:', stats.isDirectory());
+    debugLog('[Overlay Server] Overlay directory exists:', stats.isDirectory());
     const files = fs.readdirSync(OVERLAY_ROOT);
-    console.log('[Overlay Server] Files in overlay directory:', files);
+    debugLog('[Overlay Server] Files in overlay directory:', files);
   } catch (err) {
     console.error('[Overlay Server] Error accessing overlay directory:', err);
   }
@@ -66,7 +75,7 @@ export async function startOverlayServer() {
     });
 
     httpServer.listen(WEBSERVER_PORT, '0.0.0.0', () => {
-      console.log(`[Overlay Server] Server listening on http://0.0.0.0:${WEBSERVER_PORT}`);
+      debugLog(`[Overlay Server] Server listening on http://0.0.0.0:${WEBSERVER_PORT}`);
       resolve();
     });
   });

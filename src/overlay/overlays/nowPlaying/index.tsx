@@ -44,6 +44,14 @@ export type NowPlayingConfig = {
    */
   theme: Theme;
   /**
+   * The font family to use
+   */
+  fontFamily?: 'default' | 'beatport';
+  /**
+   * The artwork icon to use when artwork is missing
+   */
+  artworkIcon?: 'default' | 'beatport';
+  /**
    * The number of history items to show
    */
   historyCount?: number;
@@ -197,6 +205,42 @@ const ConfigInterface: React.FC<{config: NowPlayingConfig}> = observer(({config}
           onChange={action((v: any) => set(config, {theme: v.value}))}
         />
       </Field>
+      <Field
+        noCenter
+        size="lg"
+        name="Font"
+        description="Choose the font family for the overlay text."
+      >
+        <Select
+          value={{
+            value: config.fontFamily ?? 'default',
+            label: config.fontFamily === 'beatport' ? 'Beatport' : 'Default',
+          }}
+          options={[
+            {value: 'default', label: 'Default'},
+            {value: 'beatport', label: 'Beatport'},
+          ]}
+          onChange={action((v: any) => set(config, {fontFamily: v.value}))}
+        />
+      </Field>
+      <Field
+        noCenter
+        size="lg"
+        name="Artwork Icon"
+        description="Choose the icon to display when track artwork is missing."
+      >
+        <Select
+          value={{
+            value: config.artworkIcon ?? 'default',
+            label: config.artworkIcon === 'beatport' ? 'Beatport' : 'Default',
+          }}
+          options={[
+            {value: 'default', label: 'Default'},
+            {value: 'beatport', label: 'Beatport'},
+          ]}
+          onChange={action((v: any) => set(config, {artworkIcon: v.value}))}
+        />
+      </Field>
       {enabledConfigs.includes('alignRight') && (
         <Field
           size="sm"
@@ -294,6 +338,8 @@ const descriptor: OverlayDescriptor<TaggedNowPlaying> = {
   configInterface: ConfigInterface,
   defaultConfig: {
     theme: 'tracklist',
+    fontFamily: 'default',
+    artworkIcon: 'default',
     historyCount: 4,
     maskId: true,
     tags: ['album', 'label', 'comment'],

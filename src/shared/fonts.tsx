@@ -50,34 +50,34 @@ export default css`
 
   /* ProximaNova */
   @font-face {
-    font-family: 'Proxmia Nova';
+    font-family: 'Proxima Nova';
     src: url(${proximaNovaRegular}) format('truetype');
     font-weight: 400;
   }
   @font-face {
-    font-family: 'Proxmia Nova';
+    font-family: 'Proxima Nova';
     src: url(${proximaNovaRegularIt}) format('truetype');
     font-weight: 400;
     font-style: italic;
   }
   @font-face {
-    font-family: 'Proxmia Nova';
+    font-family: 'Proxima Nova';
     src: url(${proximaNovaSemibold}) format('truetype');
     font-weight: 500;
   }
   @font-face {
-    font-family: 'Proxmia Nova';
+    font-family: 'Proxima Nova';
     src: url(${proximaNovaSemiboldIt}) format('truetype');
     font-weight: 500;
     font-style: italic;
   }
   @font-face {
-    font-family: 'Proxmia Nova';
+    font-family: 'Proxima Nova';
     src: url(${proximaNovaBold}) format('truetype');
     font-weight: 600;
   }
   @font-face {
-    font-family: 'Proxmia Nova';
+    font-family: 'Proxima Nova';
     src: url(${proximaNovaBoldIt}) format('truetype');
     font-weight: 600;
     font-style: italic;

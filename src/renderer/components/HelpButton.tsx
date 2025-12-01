@@ -1,5 +1,5 @@
-import {Fragment} from 'react';
-import {HelpCircle} from 'react-feather';
+import { Fragment } from 'react';
+import { HelpCircle } from 'react-feather';
 import styled from '@emotion/styled';
 
 import LogoBig from 'src/shared/components/LogoBig';
@@ -8,7 +8,7 @@ import useModal from 'src/utils/useModal';
 import ActionButton from './ActionButton';
 
 const HelpButton = () => {
-  const [modal, toggleModal] = useModal(({Modal}) => (
+  const [modal, toggleModal] = useModal(({ Modal }) => (
     <Modal>
       <LogoBig />
       <p>
@@ -18,7 +18,7 @@ const HelpButton = () => {
         <a href="https://github.com/evanpurkhiser/prolink-tools">available on GitHub</a>.
       </p>
       <p>
-        Prolink Tools was created by{' '}
+        Original Prolink Tools build was created by{' '}
         <a href="https://evanpurkhiser.com">Evan Purkhiser</a>.
       </p>
       <hr />

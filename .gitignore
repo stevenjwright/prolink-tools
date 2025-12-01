@@ -2,3 +2,9 @@ node_modules/
 dist/
 release/
 .env
+src/.DS_Store
+src/overlay/.DS_Store
+src/renderer/.DS_Store
+src/shared/.DS_Store
+src/website/.DS_Store
+.DS_Store

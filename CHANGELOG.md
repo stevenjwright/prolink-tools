@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- **Font selector for overlays** 🔤
+
+  You can now choose between two font options for your Now Playing overlays:
+  - **Default**: Uses the original fonts (Ubuntu for Track List theme, Proxima Nova for A State of Overlays theme)
+  - **Beatport**: Uses the Aeonik BP Live font (included with the app)
+
+  The font selector is available in the overlay configuration panel and your selection is saved with your overlay settings.
+
+- **Artwork icon selector** 🎨
+
+  When track artwork is missing, you can now choose which placeholder icon to display:
+  - **Default**: Classic disc/vinyl icon
+  - **Beatport**: Custom Beatport logo icon
+
+  The icon color is customizable via the theme's color settings (uses the `--pt-np-empty-art-icon` CSS variable).
+
+- **Developer tools menu** 🛠
+
+  Added "Toggle Developer Tools" menu item to the View menu (⌘ + ⌥ + I) for easier debugging access.
+
+- **Debug logging toggle** 📝
+
+  Added "Toggle Debug Logging" menu item to the View menu (⌘ + ⇧ + L). Debug logging is now disabled by default to reduce console noise. Enable it when troubleshooting issues. Your preference is saved between sessions.
+
 - **Added "Follow master" to timing settings** 🟠
 
   You may now select 'Follow master' to have now playing updates only happen
@@ -17,6 +41,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+- **Developer tools behavior** 💻
+
+  Developer tools no longer open automatically on app launch. Use ⌘ + ⌥ + I or the View menu to open them when needed.
+
+- **Debug logging behavior** 🔇
+
+  Console logging is now disabled by default. Previously, detailed startup logs were always shown. Enable debug logging via the View menu when needed.
+
 - Now playing timing options have been restructured to now have 3 "modes".
   Previously the "smart timing" mode was implicitly enabled, and turning on
   "only report after last track ends" would disable it.
@@ -24,6 +56,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   Each mode is now explicitly an option that you may only select one of.
 
 ### Fixed
+
+- **Proxima Nova font loading** 🔧
+
+  Fixed a typo in the Proxima Nova font definition ("Proxmia Nova" → "Proxima Nova") that prevented the font from loading correctly in the A State of Overlays theme.
 
 - Cloud Mode should now be more stable and will not intermittently lose
   connection.

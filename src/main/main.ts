@@ -136,9 +136,19 @@ app.on('ready', async () => {
     registerMainIpc(mainStore, register);
     debugLog('[Main] IPC registered');
 
+    // Start overlay http / websocket server FIRST
+    // This ensures overlays are always available, even if network connection fails or hangs
+    debugLog('[Main] Starting overlay server...');
+    const httpServer = await startOverlayServer();
+    debugLog('[Main] Overlay server started successfully');
+
+    // Start the main websocket on the overlay server (this doesn't depend on DJ network)
+    registerMainWebsocket(mainStore, httpServer, register);
+    debugLog('[Main] Overlay WebSocket registered');
+
     let network: ProlinkNetwork | undefined;
 
-    // Open connections to the network
+    // Open connections to the CDJ network
     debugLog('[Main] Attempting to bring network online...');
     try {
       network = await bringOnline();
@@ -161,26 +171,6 @@ app.on('ready', async () => {
     debugLog('[Main] Port in use (EADDRINUSE), marking network as failed');
     mainStore.markNetworkState(NetworkState.Failed);
   }
-
-  debugLog('[Main] About to start overlay server...');
-  // Start overlay http / websocket server.
-  //
-  // XXX: Becuase of a strange bug in MacOS's firewall dialog, if two
-  // connections are opened at the same time before the program is given
-  // permission to open connections, when the software is closed the kernel
-  // will not correctly close one of the ports.
-  //
-  // Because the `network.bringOnline` will block until connected we ensure two
-  // are not opened
-  //
-  // As thus THIS LINE MUST BE PLACED AFTER THE NETWORK IS BROUGHT ONLINE.
-  //
-  const httpServer = await startOverlayServer();
-  debugLog('[Main] Overlay server started successfully');
-
-  // Start the main websocket on the overlay server (this doesn't depend on DJ network)
-  registerMainWebsocket(mainStore, httpServer, register);
-  debugLog('[Main] Overlay WebSocket registered');
 
   // Only set up network-dependent features if network is available
   if (network) {
